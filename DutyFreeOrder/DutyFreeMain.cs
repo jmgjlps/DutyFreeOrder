@@ -22,12 +22,33 @@ namespace DutyFreeOrder
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
-            test();
+            Dictionary<string, string> postParams = new Dictionary<string, string>();
+            postParams.Add("userId", txtUserID.Text.ToString().Trim());
+            postParams.Add("password", txtUserPassword.Text.ToString().Trim());
+            postParams.Add("userExitInfoFlag", "N");
+            postParams.Add("encPassword", "");
+            postParams.Add("recoveryYn", "");
+            postParams.Add("failYn", "");
+            postParams.Add("failCnt", "");
+            postParams.Add("loginLock", "");
+            postParams.Add("nonUserType", "");
+            postParams.Add("redirectUrl", "https://www.ssgdfm.com/common/redirectURL?encURL=http://www.ssgdfm.com/shop/main");
+
+            string postStr = "";
+            foreach (string key in postParams.Keys)
+            {
+                postStr += key + "=" + postParams[key] + "&";
+            }
+
+            //string sPostData = "redirectUrl=%2Fcommon%2FredirectURL%3FencURL%3Dhttp%3A%2F%2Fwww.ssgdfm.com%2Fshop%2Fmain_qs_utm_source%3Ddaum_amp_utm_medium%3DCPC_amp_utm_term%3D_percent_EC_percent_8B_percent_A0_percent_EC_percent_84_percent_B8_percent_EA_percent_B3_percent_84_percent_EB_percent_A9_percent_B4_percent_EC_percent_84_percent_B8_percent_EC_percent_A0_percent_90_amp_utm_campaign%3Ddaum_percent_5Fkw&nonUserType=&loginLock=&failCnt=&failYn=&recoveryYn=&encPassword=&userExitInfoFlag=N&userId=dreamcatcher007&password=lbc123456&%EB%A1%9C%EA%B7%B8%EC%9D%B8=%EB%A1%9C%EA%B7%B8%EC%9D%B8";
+            CookieContainer container = Login("https://www.ssgdfm.com/shop/login/loginPopup", postStr, null);
+
+            GetResponse("https://www.ssgdfm.com/shop/mypage/mainMyOrderList", container);
         }
 
         private void DutyFreeMain_Load(object sender, EventArgs e)
         {
-            txtUserID.Text = "";
+            txtUserID.Text = "dreamcatcher007";
             txtUserPassword.PasswordChar = '*';
             
         }
@@ -52,14 +73,16 @@ namespace DutyFreeOrder
 
         private string GetForm(string url, Dictionary<string, string> form)
         {
-            CookieContainer cookies = new CookieContainer();
+            CookieContainer container = new CookieContainer();
             string postStr = "redirectUrl=%2Fcommon%2FredirectURL%3FencURL%3Dhttp%3A%2F%2Fwww.ssgdfm.com%2Fshop%2Fmain&nonUserType=&loginLock=&failCnt=&failYn=&recoveryYn=&encPassword=&userExitInfoFlag=N&userId=dreamcatcher007&password=lbc123456&saveId=on&%EB%A1%9C%EA%B7%B8%EC%9D%B8=%EB%A1%9C%EA%B7%B8%EC%9D%B8";
+
+            //string postStr = "";
             //foreach (string key in form.Keys)
             //{
             //    postStr += key + "=" + form[key] + "&";
             //}
             byte[] postData = Encoding.ASCII.GetBytes(postStr.Substring(0, postStr.Length - 1));
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url + "/" + postStr);
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url+ "?" + postStr);
             request.Method = "GET";
             //request.AllowAutoRedirect = false;
             request.ContentType = "application/x-www-form-urlencoded";
@@ -72,32 +95,25 @@ namespace DutyFreeOrder
             request.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8";
 
             //request.Headers.Add("Connection", "keep-alive");
-
+            request.CookieContainer = container;
             request.Headers.Add("Cache-Control", "no-cache");
             request.Headers.Add("Accept-Encoding", "gzip, deflate, br");
             request.Headers.Add("Accept-Language", "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7");
             request.Headers.Add("Accept-Charset", "GBK,utf-8;q=0.7,*;q=0.3");
             request.Host = "www.ssgdfm.com";
             request.Headers.Add("Upgrade-Insecure-Requests", "1");
-            request.Headers.Add("Cookie", "_xm_webid_1_=-1351829730; wcs_bt=s_585aee23d0cf:1532494480; dmp_uid_checker=DUMMY_FOR_COOKIE_SYNC_CHECK; recopick_uid=74483822.1532479740373; JSESSIONID=bacBZiEyZH6lLTrXDQv8G6u4yzle8NYngBEZE4YSWwaI1y6u0OY1Ix9w2cP1jUmy.ZGZtYWxsX2RvbWFpbi9zc2dkZm1fay13ZWIyMQ==; _ga=GA1.2.709889134.1532479738; _gid=GA1.2.167903053.1532479738; RB_PCID=1532479738818382877; RB_GUID=165aed16-854d-4906-a40e-c316b473363b; userRecopickKey=RFJFQU1DQVRDSEVSMDA3; ID_SAVE_KEY=dreamcatcher007; RB_SSID=eGWJfETocs; userCookieKey=DXXgVDcH9FkaupXRDsXwxg%3D%3D");
+            //request.Headers.Add("Cookie", "_xm_webid_1_=-1351829730; wcs_bt=s_585aee23d0cf:1532494480; dmp_uid_checker=DUMMY_FOR_COOKIE_SYNC_CHECK; recopick_uid=74483822.1532479740373; JSESSIONID=bacBZiEyZH6lLTrXDQv8G6u4yzle8NYngBEZE4YSWwaI1y6u0OY1Ix9w2cP1jUmy.ZGZtYWxsX2RvbWFpbi9zc2dkZm1fay13ZWIyMQ==; _ga=GA1.2.709889134.1532479738; _gid=GA1.2.167903053.1532479738; RB_PCID=1532479738818382877; RB_GUID=165aed16-854d-4906-a40e-c316b473363b; userRecopickKey=RFJFQU1DQVRDSEVSMDA3; ID_SAVE_KEY=dreamcatcher007; RB_SSID=eGWJfETocs; userCookieKey=DXXgVDcH9FkaupXRDsXwxg%3D%3D");
             #endregion
 
-            HttpWebResponse wRes;
-            using (wRes = (HttpWebResponse)request.GetResponse())
-            {
-                Stream respPostStream = wRes.GetResponseStream();
-                StreamReader readerPost = new StreamReader(respPostStream, Encoding.GetEncoding("EUC-KR"), true);
-
-                string resResult = readerPost.ReadToEnd();
-            }
-
-            Stream requestStream = request.GetRequestStream();
-            requestStream.Write(postData, 0, postData.Length);
-            requestStream.Close();
+            //Stream requestStream = request.GetRequestStream();
+            //requestStream.Write(postData, 0, postData.Length);
+            //requestStream.Close();
 
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             Stream responseStream = response.GetResponseStream();
             StreamReader reader = new StreamReader(responseStream);
+
+            response.Cookies = container.GetCookies(request.RequestUri);
 
             string cookie = response.Headers.Get("Set-Cookie");
             string resultPage = reader.ReadToEnd();
@@ -110,7 +126,7 @@ namespace DutyFreeOrder
 
         private string PostForm(string url, Dictionary<string, string> form)
         {
-            CookieContainer cookies = new CookieContainer();
+            CookieContainer container = new CookieContainer();
             string postStr = "";
             foreach (string key in form.Keys)
             {
@@ -119,7 +135,7 @@ namespace DutyFreeOrder
             byte[] postData = Encoding.ASCII.GetBytes(postStr.Substring(0, postStr.Length - 1));
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = "POST";
-            //request.AllowAutoRedirect = false;
+            request.AllowAutoRedirect = false;
             request.ContentType = "application/x-www-form-urlencoded";
             request.CookieContainer = new CookieContainer();
             request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36";
@@ -138,6 +154,8 @@ namespace DutyFreeOrder
             request.Headers.Add("Accept-Charset", "GBK,utf-8;q=0.7,*;q=0.3");
             request.Host = "www.ssgdfm.com";
             request.Headers.Add("Upgrade-Insecure-Requests", "1");
+
+            request.CookieContainer = container;
             #endregion
 
             Stream requestStream = request.GetRequestStream();
@@ -147,6 +165,8 @@ namespace DutyFreeOrder
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             Stream responseStream = response.GetResponseStream();
             StreamReader reader = new StreamReader(responseStream);
+
+            response.Cookies = container.GetCookies(request.RequestUri);
 
             string cookie = response.Headers.Get("Set-Cookie");
             string resultPage = reader.ReadToEnd();
@@ -290,6 +310,85 @@ namespace DutyFreeOrder
             response.Close();
 
             return htmlText;
+        }
+
+        public static CookieContainer Login(string url, string sPostData, CookieContainer cc)
+        {
+            CookieContainer container = (cc == null) ? new CookieContainer() : cc;
+            ASCIIEncoding encoding = new ASCIIEncoding();
+            byte[] data = encoding.GetBytes(sPostData);
+
+            HttpWebRequest resquest = ResquestInit(url);
+            resquest.Method = "POST";
+            resquest.ContentLength = data.Length;
+            resquest.CookieContainer = container;
+
+            Stream newStream = resquest.GetRequestStream();
+            newStream.Write(data, 0, data.Length);
+            newStream.Close();
+            try
+            {
+                HttpWebResponse response = (HttpWebResponse)resquest.GetResponse();
+                response.Cookies = container.GetCookies(resquest.RequestUri);
+            }
+            catch { }
+
+            return container;
+        }
+        //这个函数的作用就是统一Request的格式，使得每次访问目标网站都用相同的口径。如果参数不同的话，可能造成COOKIE无效，因而登录无效
+        public static HttpWebRequest ResquestInit(string url)
+        {
+            Uri target = new Uri(url);
+            HttpWebRequest resquest = (HttpWebRequest)WebRequest.Create(target);
+            resquest.UserAgent = "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2 (.NET CLR 3.5.30729)";
+            resquest.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
+            resquest.AllowAutoRedirect = true;
+            resquest.KeepAlive = true;
+            resquest.ReadWriteTimeout = 120000;
+            resquest.ContentType = "application/x-www-form-urlencoded";
+            resquest.Referer = url;
+
+            return resquest;
+
+        }
+
+        static HttpWebResponse GetResponse(string url, CookieContainer cc)
+        {
+            try
+            {
+                CookieContainer container = (cc == null) ? new CookieContainer() : cc;
+                HttpWebRequest resquest = ResquestInit(url);
+                resquest.CookieContainer = container;
+                HttpWebResponse response = (HttpWebResponse)resquest.GetResponse();
+                response.Cookies = container.GetCookies(resquest.RequestUri);
+
+                Stream st;
+                st = response.GetResponseStream();
+
+                //if (response.ContentEncoding.ToLower().Contains("gzip"))
+                //{
+                //    st = new GZipStream(st, CompressionMode.Decompress, true);
+                //}
+
+                string htmlText;
+
+                StreamReader stReader = new StreamReader(st, Encoding.UTF8);
+                htmlText = stReader.ReadToEnd();
+
+                stReader.Close();
+                st.Close();
+
+                //auctionLog.ShowTextInForm(response.ResponseUri.ToString(), htmlText);
+
+                response.Close();
+
+
+                return response;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
     }
