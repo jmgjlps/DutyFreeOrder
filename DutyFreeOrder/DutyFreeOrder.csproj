@@ -201,6 +201,7 @@
     <Compile Include="DutyFreeMain.Designer.cs">
       <DependentUpon>DutyFreeMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="GoogleSample\GoogleSample.cs" />
     <Compile Include="LoginTest.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
