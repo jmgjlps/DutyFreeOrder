@@ -5,3 +5,9 @@
 /DutyFreeOrder/bin/Release/DutyFreeOrder.vshost.exe.manifest
 /DutyFreeOrder/bin/Release/DutyFreeOrder.vshost.exe.config
 /DutyFreeOrder/bin/Release/DutyFreeOrder.vshost.exe
+
+###################################################.net#########################
+
+bin/
+obj/
+packages/
