@@ -8,6 +8,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -19,7 +20,7 @@ namespace DutyFreeOrder
     public partial class DutyFreeMain : Form
     {
 
-        CookieContainer container = new CookieContainer();
+        static CookieContainer container = new CookieContainer();
         Loggin _loggin = new Loggin();
 
         public DutyFreeMain()
@@ -238,10 +239,66 @@ namespace DutyFreeOrder
             }
         }
 
+        //상품상세
+        static async Task MainAsync()
+        {
+            using (var handler = new HttpClientHandler() { CookieContainer = container })
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri("https://www.ssgdfm.com");
+                var content = new FormUrlEncodedContent(new[]
+                {
+                    new KeyValuePair<string, string>("prdtCode", "01279000023") // 01279000023 판매중상품 위시리스트  일반상품 41009000349
+                });
+                var result = await client.PostAsync("/shop/product/productDetail", content);
+
+                string resultContent = await result.Content.ReadAsStringAsync();
+                HtmlAgilityPack.HtmlDocument mydoc = new HtmlAgilityPack.HtmlDocument();
+                mydoc.LoadHtml(resultContent);
+
+                HtmlNodeCollection nodeCollection = mydoc.DocumentNode.SelectNodes("//div[@class='priceInfo']//ul[@class='buy_btn']//li[@class='btn_list']//a");
+
+                HtmlNodeCollection nodeCollection1 = mydoc.DocumentNode.SelectNodes("//div[@class='info-product']//form//div[@class='sold-out']"); //위시리스트 상품
+
+
+                if (nodeCollection == null)
+                {
+                    //품절상태 입니다. 
+                }
+                else {
+                    string btnName = nodeCollection.Elements().ElementAt(0).InnerHtml;
+
+                    if (btnName == "일시품절")
+                    {
+
+                    }
+                    else if (btnName == "바로구매")
+                    {
+
+                    }
+                    else {
+
+                    }
+                }
+
+                HtmlNode tempNode = null;
+
+                foreach (HtmlNode node in nodeCollection)
+                {
+                    tempNode = HtmlNode.CreateNode(node.OuterHtml);
+
+                    string soldOut = tempNode.SelectSingleNode("//ul[@class='buy_btn']").InnerHtml;
+                }
+            }
+        }
+
         //检查库存
         private void btnGoodsCheck_Click(object sender, EventArgs e)
         {
-            GetGoodDetail("01049000610");
+            Task.Run(() => MainAsync());
+            Console.ReadLine();
+
+            //GetGoodDetail("01049000610");
             //GetMyWishList();
         }
 
