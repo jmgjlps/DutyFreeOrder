@@ -3,3 +3,7 @@
 ################################################################################
 
 /packages
+/.vs/DutyFreeOrder/DesignTimeBuild
+/.vs/DutyFreeOrder/v15
+/DutyFreeOrder/bin/Debug
+/DutyFreeOrder/obj/Debug
