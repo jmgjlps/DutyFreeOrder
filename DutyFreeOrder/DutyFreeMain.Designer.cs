@@ -80,7 +80,6 @@
             // 
             // btnGoodsCheck
             // 
-            this.btnGoodsCheck.Enabled = false;
             this.btnGoodsCheck.Location = new System.Drawing.Point(135, 78);
             this.btnGoodsCheck.Name = "btnGoodsCheck";
             this.btnGoodsCheck.Size = new System.Drawing.Size(75, 23);

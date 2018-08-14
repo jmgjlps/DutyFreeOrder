@@ -7,3 +7,6 @@
 /.vs/DutyFreeOrder/v15
 /DutyFreeOrder/bin/Debug
 /DutyFreeOrder/obj/Debug
+/DutyFreeOrder/obj/Release
+/DutyFreeOrder/bin/Release
+/.vs/DutyFreeOrder/v14

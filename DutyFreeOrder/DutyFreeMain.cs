@@ -34,11 +34,11 @@ namespace DutyFreeOrder
 
             if (!CheckCookie())
             {
-                MessageBox.Show("登录失败");
+                richTextBox1.AppendText("登陆失败！ 请重试！");
             }
             else
             {
-                MessageBox.Show("登录成功");
+                richTextBox1.AppendText("登陆成功");
 
                 btnLogin.Enabled = false;
                 btnGoodsCheck.Enabled = true;
@@ -239,18 +239,64 @@ namespace DutyFreeOrder
             }
         }
 
-        //상품상세
-        static async Task MainAsync()
+        //일반 상품 상세
+        static async Task GetProductItemViewBox(string productCode)
         {
             using (var handler = new HttpClientHandler() { CookieContainer = container })
-            using (var client = new HttpClient())
+            using (var client = new HttpClient(handler))
             {
                 client.BaseAddress = new Uri("https://www.ssgdfm.com");
+
                 var content = new FormUrlEncodedContent(new[]
                 {
-                    new KeyValuePair<string, string>("prdtCode", "01279000023") // 01279000023 판매중상품 위시리스트  일반상품 41009000349
+                    new KeyValuePair<string, string>("siteNatnCode", "KR"),
+                    new KeyValuePair<string, string>("optnSelected", "N"),
+                    new KeyValuePair<string, string>("saleStoreCode", "06"),
+                    new KeyValuePair<string, string>("prdtCode", productCode) // 01279000023 판매중상품 위시리스트  일반상품 41009000349
                 });
-                var result = await client.PostAsync("/shop/product/productDetail", content);
+                var result = await client.PostAsync("/shop/product/ajax/getProductItemViewBox", content);
+
+
+                string resultContent = await result.Content.ReadAsStringAsync();
+                HtmlAgilityPack.HtmlDocument mydoc = new HtmlAgilityPack.HtmlDocument();
+                mydoc.LoadHtml(resultContent);
+
+                HtmlNodeCollection nodeCollection = mydoc.DocumentNode.SelectNodes("//div[@class='info-product']//form//div[@class='button-group']//a[@class='btn-productDetail btn-buy']");
+
+                string saleYN = "N";
+
+                if (nodeCollection != null)
+                {
+                    string btnName = nodeCollection.Elements().ElementAt(0).InnerHtml;
+
+                    if (btnName == "바로구매")
+                    {
+                        saleYN = "Y";
+                    }
+                }
+
+                if (saleYN == "Y")
+                {
+                    //ORDER START
+                }
+            }
+        }
+
+        //브랜드샵 상품
+        static async Task GetBrandShopViewItem(string url, string productCode)
+        {
+            using (var handler = new HttpClientHandler() { CookieContainer = container })
+            using (var client = new HttpClient(handler))
+            {
+                client.BaseAddress = new Uri("https://www.ssgdfm.com");
+
+                var content = new FormUrlEncodedContent(new[]
+                {
+                    new KeyValuePair<string, string>("isRedirect", "Y"),
+                    new KeyValuePair<string, string>("prdtCode", productCode) // 01279000023 판매중상품 위시리스트  일반상품 41009000349
+                });
+                var result = await client.PostAsync(url, content);
+
 
                 string resultContent = await result.Content.ReadAsStringAsync();
                 HtmlAgilityPack.HtmlDocument mydoc = new HtmlAgilityPack.HtmlDocument();
@@ -258,36 +304,21 @@ namespace DutyFreeOrder
 
                 HtmlNodeCollection nodeCollection = mydoc.DocumentNode.SelectNodes("//div[@class='priceInfo']//ul[@class='buy_btn']//li[@class='btn_list']//a");
 
-                HtmlNodeCollection nodeCollection1 = mydoc.DocumentNode.SelectNodes("//div[@class='info-product']//form//div[@class='sold-out']"); //위시리스트 상품
+                string saleYN = "N";
 
-
-                if (nodeCollection == null)
+                if (nodeCollection != null)
                 {
-                    //품절상태 입니다. 
-                }
-                else {
                     string btnName = nodeCollection.Elements().ElementAt(0).InnerHtml;
-
-                    if (btnName == "일시품절")
+                    
+                    if (btnName == "바로구매")
                     {
-
-                    }
-                    else if (btnName == "바로구매")
-                    {
-
-                    }
-                    else {
-
+                        saleYN = "Y";
                     }
                 }
 
-                HtmlNode tempNode = null;
-
-                foreach (HtmlNode node in nodeCollection)
+                if (saleYN == "Y")
                 {
-                    tempNode = HtmlNode.CreateNode(node.OuterHtml);
-
-                    string soldOut = tempNode.SelectSingleNode("//ul[@class='buy_btn']").InnerHtml;
+                    //ORDER START
                 }
             }
         }
@@ -295,11 +326,42 @@ namespace DutyFreeOrder
         //检查库存
         private void btnGoodsCheck_Click(object sender, EventArgs e)
         {
-            Task.Run(() => MainAsync());
-            Console.ReadLine();
+            string[] urlList = {
+                "http://www.ssgdfm.com/shop/product/productDetail?prdtCode=01279000023",
+                "http://www.ssgdfm.com/brandShop/mac/viewItem?isRedirect=Y&prdtCode=05029002742",
+                "http://www.ssgdfm.com/brandShop/esteelauder/spp?isRedirect=Y&prdtCode=01070112101",
+                "http://www.ssgdfm.com/shop/product/productDetail?prdtCode=08009000886",
+                "http://www.ssgdfm.com/shop/product/productDetail?prdtCode=01279000086"//구매가능
+            };
 
-            //GetGoodDetail("01049000610");
-            //GetMyWishList();
+            foreach (string strUrl in urlList)
+            {
+                Regex reg = new Regex(@"(?imn)(?<do>(http|https)://[^/]+)(?<dir>([^?]+?)*([^?]*$)?)");
+                //Regex reg = new Regex(@"(?imn)(?<do>(http|https)://[^/]+/)(?<dir>([^/]+/)*([^/.]*$)?)");
+                MatchCollection mc = reg.Matches(strUrl);
+
+                Regex regPrd = new Regex(@"prdtCode=([^&]*)?");
+                string productCode = regPrd.Match(strUrl).Groups[1].Value;
+                string path = string.Empty;
+                foreach (Match m in mc)
+                {
+                    path = m.Groups["dir"].Value; 
+                }
+
+                if (strUrl.IndexOf("productDetail") > 0)
+                {
+                    Task.Run(() => GetProductItemViewBox(productCode));
+                }
+                else if (strUrl.IndexOf("viewItem") > 0)
+                {
+                    Task.Run(() => GetBrandShopViewItem(path, productCode));
+                }
+                else
+                {
+                    richTextBox1.AppendText("发现 异常 商品地址 ===>>>" + strUrl);
+                }
+            }
+          
         }
 
         private void GetGoodDetail(string productCode)
