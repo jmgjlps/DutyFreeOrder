@@ -194,6 +194,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\AuctionLog.cs" />
     <Compile Include="Common\Loggin.cs" />
     <Compile Include="Common\PageProcessor.cs" />
     <Compile Include="DutyFreeMain.cs">
@@ -203,6 +204,7 @@
       <DependentUpon>DutyFreeMain.cs</DependentUpon>
     </Compile>
     <Compile Include="Entity\ProductEntity.cs" />
+    <Compile Include="Handle\ProductPageHandle.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="DutyFreeMain.resx">
