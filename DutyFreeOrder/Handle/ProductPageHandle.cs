@@ -13,17 +13,9 @@ namespace DutyFreeOrder.Handle
     {
         AuctionLog auctionLog;
 
-        private PropertyList propertyList;
-
-        private QuestionForm questionForm;
-
         public ProductPageHandle(AuctionLog auctionLog)
         {
             this.auctionLog = auctionLog;
-
-            propertyList = new PropertyList();
-
-            questionForm = new QuestionForm();
         }
 
         //属性标题值对类
@@ -78,13 +70,6 @@ namespace DutyFreeOrder.Handle
             skuId = string.Empty;
             skuInfo = string.Empty;
             productPage = string.Empty;
-
-            if (propertyList.Pts != null)
-            { propertyList.Pts.Clear(); }
-            else
-            { propertyList.Pts = new ArrayList(); }
-
-            questionAnswer = string.Empty;
         }
 
         //信息变量定义
@@ -99,29 +84,6 @@ namespace DutyFreeOrder.Handle
             {
                 auctionLog.Log("警告：传递的商品页源代码字符串为空");
                 return;
-            }
-
-            //提取问题并要求回答
-            Match questionMatch = Regex.Match(productPage, "<div\\s*class\\s*=\\s*\"\\s*disqualified\\s*\".*?<\\s*br.*?>(?<question>.*?)\\s*<\\s*/\\s*div>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
-            if (questionMatch.Success)
-            {
-                string question = string.Empty;
-                string questionContent = questionMatch.Groups["question"].ToString();
-                MatchCollection charMatches = Regex.Matches(questionContent, "&#(?<number>\\d+)\\s*;", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
-                if (charMatches.Count > 0)
-                {
-                    foreach (Match match in charMatches)
-                    {
-                        int charNumber = int.Parse(match.Groups["number"].ToString());
-                        question += Convert.ToChar(charNumber);
-                    }
-                }
-                if (!string.IsNullOrEmpty(question))
-                {
-                    questionForm.lblQuestion.Text = question;
-                    questionForm.ShowDialog();
-                    questionAnswer = questionForm.txtAnswer.Text.Trim();
-                }
             }
 
             string frmContent, inputContent, tempStr;
@@ -311,13 +273,6 @@ namespace DutyFreeOrder.Handle
             }
 
             GetProductProperties();
-            if (pts.Count > 0 && showPropertyList)
-            {
-                propertyList.Pts = pts;
-                propertyList.ShowDialog();
-                propertyCombine = propertyList.PropertiesString;
-                auctionLog.Log("通知：用户自己选择了属性信息");
-            }
 
             GetProductSkuMap();
 

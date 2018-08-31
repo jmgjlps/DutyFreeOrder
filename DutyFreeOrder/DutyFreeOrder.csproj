@@ -204,6 +204,7 @@
       <DependentUpon>DutyFreeMain.cs</DependentUpon>
     </Compile>
     <Compile Include="Entity\ProductEntity.cs" />
+    <Compile Include="Handle\OrderHandle.cs" />
     <Compile Include="Handle\ProductPageHandle.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
